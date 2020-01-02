@@ -29,10 +29,21 @@ export const Summoner = styled.div`
     justify-content: center;
 
   button {
+    cursor: pointer;
+    background-color: Transparent;
     border: none;
-    background-color: transparent;
-    outline: none;
-    padding: 10px;
+    height: 55px;
+    padding: 0 20px;
+    margin-left: 10px;
+    color: #000;
+    border: 0;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 3px;
+
+    &:hover{
+      color: #f0f0f0;
+    }
   }
 
   img {

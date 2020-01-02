@@ -6,26 +6,37 @@ import api from '../../services/api';
 
 export default class Main extends Component {
   state = {
+    loading: false,
     summonerInput: '',
-    summoner: ''
+    summoner: '',
+    summonerError: false
   };
 
   handleSearchSummoner = async (e) => {
     e.preventDefault();
+    this.setState({ summonerError: false })
+    if (this.state.summonerInput === '') return this.setState({ summonerError:true })
     try {
+      this.setState({ loading: true})
       const summoner = await api.post(`summoner/`, {name: this.state.summonerInput})
       console.log(summoner)
-      this.setState({ summoner: summoner.data })
+      if (summoner.data.error === 'user not exists') return this.setState({ summonerError:true })
+      this.setState({ summonerInput: '',
+                      summoner: summoner.data })
     } catch (err) {
+      this.setState({ loading: true})
+      this.setState({ summoner: '' })
+      this.setState({ summonerError: true })
       console.log(err)
+    } finally {
+      this.setState({ loading: false})
     }
   }
 
   handleLikeSummoner = async (e) => {
-    console.log('ola')
     e.preventDefault();
     try {
-      const summoner = await api.post(`summoner/${this.state.summonerInput}/like`, 'user', {headers: {name: `${this.state.summonerInput}`}})
+      const summoner = await api.post(`summoner/${this.state.summoner.summonerName}/like`, 'user', {headers: {name: `${this.state.summoner.summonerName}`}})
       console.log(summoner)
       this.setState({ summoner: summoner.data })
     } catch (err) {
@@ -34,10 +45,9 @@ export default class Main extends Component {
   }
 
   handleDislikeSummoner = async (e) => {
-    console.log('ola')
     e.preventDefault();
     try {
-      const summoner = await api.post(`summoner/${this.state.summonerInput}/dislike`, 'user', {headers: {name: `${this.state.summonerInput}`}})
+      const summoner = await api.post(`summoner/${this.state.summoner.summonerName}/dislike`, 'user', {headers: {name: `${this.state.summoner.summonerName}`}})
       console.log(summoner)
       this.setState({ summoner: summoner.data })
     } catch (err) {
@@ -48,11 +58,12 @@ export default class Main extends Component {
   render() {
     return (
       <Container>
-        <Form onSubmit={this.handleSearchSummoner}>
+        <Form withError={this.state.summonerError} onSubmit={this.handleSearchSummoner}>
           <input type="text" 
           placeholder="Digite o Invocador"
+          value={this.state.summonerInput}
           onChange={e => this.setState({ summonerInput: e.target.value })} />
-          <button type="submit">OK</button>
+          <button type="submit"> {this.state.loading ? <i className="fa fa-spinner fa-pulse"/> : 'OK'} </button>
         </Form>
         { this.state.summoner ? <SummonerInformation summoner={this.state.summoner} 
         like = {this.handleLikeSummoner}
