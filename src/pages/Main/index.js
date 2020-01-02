@@ -19,15 +19,13 @@ export default class Main extends Component {
     try {
       this.setState({ loading: true})
       const summoner = await api.post(`summoner/`, {name: this.state.summonerInput})
-      console.log(summoner)
-      if (summoner.data.error === 'user not exists') return this.setState({ summonerError:true })
       this.setState({ summonerInput: '',
                       summoner: summoner.data })
     } catch (err) {
-      this.setState({ loading: true})
-      this.setState({ summoner: '' })
-      this.setState({ summonerError: true })
-      console.log(err)
+      this.setState({ loading: true,
+                      summoner: '',
+                      summonerError: true
+      })
     } finally {
       this.setState({ loading: false})
     }
